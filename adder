@@ -4,7 +4,7 @@ module adder (
     input wire [31:0] b,
     output wire [31:0] c
 );
-    wire [32:0] carry;
+   wire carry [32:0];
    assign carry[0] = 0; 
     // Least Significant Bit (LSB) using Half Adder
     half_adder HA3 (
