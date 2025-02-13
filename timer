@@ -3,7 +3,7 @@ module counter (
 input clk,
 input resetn,
 input enable,
-output wire [31:0] count
+output reg [31:0] count
 );
 
     wire [31:0] next_count;
@@ -21,7 +21,7 @@ output wire [31:0] count
    
     assign mux_out = (enable) ? next_count : count; 
 
-    always @(posedge clk or negedge resetn) begin
+    always @(posedge clk) begin
         if (!resetn)
             count <= 32'd0; 
         else
