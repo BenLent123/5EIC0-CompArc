@@ -11,7 +11,7 @@ such that ALUCtl_value = {funct7_value[5], funct3_value}; --> 1 1 1 1 --> 4'd15
 
 
 ctrl.v
-    7'd11: begin // 1000101 Custom CLIP Instruction
+    7'd11: begin // 001011 Custom CLIP Instruction
         valid = 1'b1;         // Mark the instruction as valid
         rs1 = rs1_value;      // Source register
         rs2 = rs2_value;      // source register 2
