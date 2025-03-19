@@ -1,0 +1,28 @@
+asm instruction -> clipping CLIP(result)
+#define CLIP(a) asm (".insn r CUSTOM_0, 0x7, 0x20, %[dst], %[src], zero" : [dst] "=r" (a) : [src] "r" (a))
+(hex) -> found in image.objdump -> (binary)opcode
+1bc:  4007f78b           .insn 4, 0x4007f78b              
+(hex) 4007F78B --> (binary) 0100 0000 0000 0111 1111 0111 1000 1011
+opcode 001011 -> 11 in dec -> 7bit ->  so 7'd11
+ALUop is 2'b10 as custom instruction is R instruction 
+given that -> funct3_value = instruction[14:12] and funct7_value = instruction[31:25]
+such that ALUCtl_value = {funct7_value[5], funct3_value}; --> 1 1 1 1 --> 4'd15
+
+
+
+ctrl.v
+    7'd11: begin // 1000101 Custom CLIP Instruction
+        valid = 1'b1;         // Mark the instruction as valid
+        rs1 = rs1_value;      // Source register
+        rs2 = rs2_value;      // source register 2
+        rd = rd_value;        // Destination register
+        RegWrite = 1'b1;      // This instruction writes back to a register
+        ALUOp = 2'b10;        // ALUOp should be set to match the ALU control logic
+        ALUCtl  = 4'd15;     // Custom ALU control signal for CLIP
+        ALUSrc1 = 1'b0;       // Use register rs1 as source
+        ALUSrc2 = 1'b0;       // No immediate value needed
+    end
+
+alu.v 
+ 4'd15: ALUOut = ($signed(A)  < 0) ? 0 : (($signed(A)  > 127) ? 127 : A);
+
