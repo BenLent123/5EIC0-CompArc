@@ -60,7 +60,7 @@ always @(*) begin
         RegWrite = 1'b1;
         ALUSrc2 = 1'b1;
     end
-     7'd11: begin // 1000101 Custom CLIP Instruction
+     7'd11: begin //  Custom CLIP Instruction
         valid = 1'b1;         // Mark the instruction as valid
         rs1 = rs1_value;      // Source register
         rs2 = rs2_value;      // source register 2
