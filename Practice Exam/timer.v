@@ -5,18 +5,18 @@ module timer (
     input [4:0] value,
     input valid,
     output trigger,
-    output [4:0] count
+    output reg [4:0] count
 );
 
-    reg [4:0] count_reg, next_count;
+    reg [4:0] next_count;
     wire complete;
   
      // Count register
     always @(posedge clk) begin
         if (reset)
-            count_reg <= 5'd0;
+            count <= 5'd0;
         else
-            count_reg <= next_count;
+            count <= next_count;
     end
 
     // Combinational logic for next count
@@ -24,15 +24,15 @@ module timer (
         if (valid)
             next_count = value;
         else if (enable && !complete)
-            next_count = count_reg - 5'd1;
+            next_count = count - 1;
         else
-            next_count = count_reg;
+            next_count = count;
     end
 
    
     
-    assign complete = (count_reg == 5'd0) ? 1:0;
-    assign count = count_reg;
+    assign complete = (count == 5'd0) ? 1:0;
+   
 
     // FSM instantiation
     timer_fsm fsm_inst (
