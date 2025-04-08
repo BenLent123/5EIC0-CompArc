@@ -8,23 +8,10 @@ module timer (
     output [4:0] count
 );
 
-    reg [4:0] count_reg;
-    reg [4:0] next_count;
-
+    reg [4:0] count_reg, next_count;
     wire complete;
-    assign complete = (count_reg != 5'd0) ? 1:0;
-
-    // Combinational logic for next count
-    always @(*) begin
-        if (valid)
-            next_count = value;
-        else if (enable && valid)
-            next_count = count_reg - 5'd1;
-        else
-            next_count = count_reg;
-    end
-
-    // Count register
+  
+     // Count register
     always @(posedge clk) begin
         if (reset)
             count_reg <= 5'd0;
@@ -32,6 +19,19 @@ module timer (
             count_reg <= next_count;
     end
 
+    // Combinational logic for next count
+    always @(*) begin
+        if (valid)
+            next_count = value;
+        else if (enable && !complete)
+            next_count = count_reg - 5'd1;
+        else
+            next_count = count_reg;
+    end
+
+   
+    
+    assign complete = (count_reg == 5'd0) ? 1:0;
     assign count = count_reg;
 
     // FSM instantiation
