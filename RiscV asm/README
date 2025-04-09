@@ -1,0 +1,1 @@
+Both files give 100% however one should learn stack pushing and popping! Jump works just by modifiying the PC counter but cannot always be used to translate C code!
