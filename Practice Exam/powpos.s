@@ -19,7 +19,7 @@ main:
     mv a0,s0
     mv a1,s1
     mv t1,x0           #set t1 to 0
-    addi t1,t1,1        # set t1 to 1
+    addi t1,t1,1        # set t1 to 1  (in the main make a 1 register! technically not how your supposed to do it!)
     call powpos
     mv s1,a0
     la a0,str1
