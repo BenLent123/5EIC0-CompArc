@@ -34,7 +34,7 @@ main:
 
 gcd:        
     addi sp,sp,-4               #allocate space for one word (return address Ra to initial call of gcd from main)
-    sw ra,0(sp)                 # save that word
+    sw ra,0(sp)                 # save that word ( return address needs to be saved as "CALL" saves and overwrites Ra everytime something uses CALL) -> (we want to return to main not last call instance)
     
     beq a0,a1,done              # beq to done when a = b
     blt a1,a0,cond              # go to cond when a0>a1 so a>b
