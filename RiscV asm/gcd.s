@@ -39,14 +39,14 @@ gcd:
     beq a0,a1,done              # beq to done when a = b
     blt a1,a0,cond              # go to cond when a0>a1 so a>b
     sub a1,a1,a0                # do b-a
-    call gcd                    # callfunc gcd
+    call gcd                    # callfunc gcd ( since GCD takes a0 and a1 as input and we just did a1=a1-a0 we are calling gcd(a0,a1=a1-a0) which is gcd(A,B-A) )
     
     lw ra, 0(sp)                # load the main return address 
     addi sp,sp,4                # pop the stack
     ret                         # return
 cond:
     sub a0,a0,a1                # do a-b
-    call gcd                    # callfunc gcd
+    call gcd                    # callfunc gcd (same here but reverse so gcd(A-B,B))
     
     lw ra, 0(sp)                # load the main return address
     addi sp,sp,4                # pop stack
