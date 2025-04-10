@@ -18,8 +18,8 @@ parameter
     wwait =  3'b000,
     wwait_resend1 = 3'b001,
     wwait_resend2 = 3'b010,
-    eerror = 3'b100,
-    rrelease = 3'b011;
+    eerror = 3'b100,   ////// careful which one is 3 and which is 4
+    rrelease = 3'b011;  /////
 
 reg [2:0] curr_state;
 reg [2:0] next_state;
@@ -68,20 +68,20 @@ always@(*)begin
                     next_state = wwait_resend2; 
                     next_error = 1; //////////////debugger mistake
                     
-                    end else if (frame_valid)begin
+                    end else if (frame_valid)begin 
                     
-                    next_state = rrelease;
+                    next_state = rrelease;     
                     next_request_resend = 0;
                     next_valid = 1;
                     
                     end
                     
-    wwait_resend2: if (ack) begin
-                    next_state = 0;
-                    next_error = 0;
-                    end    
+    wwait_resend2: if (ack) begin    ///////ADDED
+                    next_state = 0;  ///
+                    next_error = 0;//////////
+                    end    ////////////
                     
-                    else if (!timeout && frame_valid) begin
+                    else if (!timeout && frame_valid) begin  ////////////CHANGED    
                     
                     next_state = wwait_resend2; /////////////////// debugger mistake
                     next_request_resend = 0; /////////////// debugger mistake
