@@ -1,0 +1,60 @@
+module UUT (
+    input clk,
+    input enable,
+    input reset,
+    output digit_entered,
+    output [1:0] command,
+    output reg [3:0] digit
+);
+
+    assign digit_entered = 1;
+    assign command = 2'b10; // DISARM command
+
+    wire [3:0] countc1, countc2, countc3, countc4;
+    wire rolloverc2_to_c3, rolloverc3_to_c4;
+    wire countc1_overflow;
+
+    counter digit_0 (
+        .clk(clk),
+        .enable(rolloverc3_to_c4),
+        .reset(reset),
+        .count(countc4)
+    );
+
+
+    counter digit_1 (
+        .clk(clk),
+        .enable(rolloverc2_to_c3),
+        .reset(reset),
+        .count(countc3),
+        .rollover(rolloverc3_to_c4)
+    );
+
+    counter digit_2 (
+        .clk(clk),
+        .enable(countc1_overflow),
+        .reset(reset),
+        .count(countc2),
+        .rollover(rolloverc2_to_c3)
+    );
+
+    
+    counter selector (
+        .clk(clk),
+        .enable(enable),
+        .reset(countc1_overflow || reset),
+        .count(countc1)
+    );
+
+    assign countc1_overflow = (countc1 == 4'd3);
+
+    // digit selection based on countc1 value
+    always @(*) begin
+        digit = countc4; // default
+        if (countc1 == 4'd2)
+            digit = countc3;
+        else if (countc1 == 4'd3)
+            digit = countc2;
+    end
+
+endmodule
