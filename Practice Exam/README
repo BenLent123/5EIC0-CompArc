@@ -1,0 +1,2 @@
+IMPORTANT NOTICE: The uart_retrans_FSM has issues such as wrong state numbering and missing states in genereal its just a mess!!!
+:(
