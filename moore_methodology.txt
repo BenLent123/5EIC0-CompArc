@@ -25,6 +25,18 @@ always @(*) begin
       end
     endcase
 end
+  --- or ----------------
+always @(*) begin
+  next_state = state;
+    case(state)
+      Initial: 
+          case(input):
+              a: next_state = bla;
+              b: next_state = bla;
+              c: next_state = bla;
+      endcase
+    endcase
+end
 
 assign output = (state == B) ? 1:0 if output is wire or
 
