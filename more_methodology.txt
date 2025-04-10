@@ -1,0 +1,33 @@
+Moore -----
+
+module name(
+inputs
+outputs
+);
+
+always @(posedge clk)begin
+  if(reset) begin
+  state <= initial;
+  end
+  else
+  state <= next_state;
+  end
+end
+
+always @(*) begin
+  next_state = state;
+    case(state)
+      Initial: begin
+      if(input) next_state = A;
+      end
+      A: begin
+      if(!input) next_state = B;
+      end
+    endcase
+end
+
+assign output = (state == B) ? 1:0 if output is wire or
+
+always @(*) begin
+ output = (state == B) ? 1:0 
+end
