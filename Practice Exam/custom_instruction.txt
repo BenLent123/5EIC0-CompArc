@@ -1,0 +1,270 @@
+Introduction
+An image kernel is applied to a 32 x 32 grayscale image. If the kernel produces a grayscale pixel value outside the 0 to 127 range, it then, should be clipped to either 0, if it is a negative number, or to 127, if it exceeds the value of 127. The clipping functionality will be implemented as a custom r-type RISC-V instruction. The custom instruction should execute as the following functionally equivalent C code, where a is the signed value of rs1 and result is the value of rd.
+
+int32_t a;
+
+uint8_t result;
+
+if ( a > 127 ) {
+
+    result = 127;
+
+} else if ( a < 0 ) {
+
+    result = 0;
+
+} else {
+
+    result = a;
+
+}
+
+Assignment
+Add hardware support for the clipping custom instructions in the current RISC-V processor implementation by modifying all or some of the provided files (ctrl.v, and alu.v). You can waveform debug the system with the debug button. The processor is instantiated under TOP.system.uut.CORE. The ctrl and alu are instantiated within the processor as Control and ALU respectively.
+
+Assembly
+The assembly of the program executing the image kernel is the following. You can find the custom clipping instruction at the address 1a4  labeled as .insn    4, 0x4005750b. 
+
+00000000 <_start>:
+   0:    00001517              auipc    a0,0x1
+   4:    30850513              add    a0,a0,776 # 1308 <__BSS_END__>
+   8:    00001597              auipc    a1,0x1
+   c:    30058593              add    a1,a1,768 # 1308 <__BSS_END__>
+  10:    00b55863              bge    a0,a1,20 <end_init_bss>
+
+00000014 <loop_init_bss>:
+  14:    00052023              sw    zero,0(a0)
+  18:    00450513              add    a0,a0,4
+  1c:    feb54ce3              blt    a0,a1,14 <loop_init_bss>
+
+00000020 <end_init_bss>:
+  20:    00000093              li    ra,0
+  24:    00000113              li    sp,0
+  28:    00000193              li    gp,0
+  2c:    00000213              li    tp,0
+  30:    00000293              li    t0,0
+  34:    00000313              li    t1,0
+  38:    00000393              li    t2,0
+  3c:    00000413              li    s0,0
+  40:    00000493              li    s1,0
+  44:    00000513              li    a0,0
+  48:    00000593              li    a1,0
+  4c:    00000613              li    a2,0
+  50:    00000693              li    a3,0
+  54:    00000713              li    a4,0
+  58:    00000793              li    a5,0
+  5c:    00000813              li    a6,0
+  60:    00000893              li    a7,0
+  64:    00000913              li    s2,0
+  68:    00000993              li    s3,0
+  6c:    00000a13              li    s4,0
+  70:    00000a93              li    s5,0
+  74:    00000b13              li    s6,0
+  78:    00000b93              li    s7,0
+  7c:    00000c13              li    s8,0
+  80:    00000c93              li    s9,0
+  84:    00000d13              li    s10,0
+  88:    00000d93              li    s11,0
+  8c:    00000e13              li    t3,0
+  90:    00000e93              li    t4,0
+  94:    00000f13              li    t5,0
+  98:    00000f93              li    t6,0
+  9c:    00001117              auipc    sp,0x1
+  a0:    46c10113              add    sp,sp,1132 # 1508 <_stack_start>
+  a4:    01c000ef              jal    c0 <main>
+  a8:    00100313              li    t1,1
+  ac:    00001297              auipc    t0,0x1
+  b0:    2062aa23              sw    t1,532(t0) # 12c0 <tohost>
+
+000000b4 <_loop>:
+  b4:    800002b7              lui    t0,0x80000
+  b8:    00a2a023              sw    a0,0(t0) # 80000000 <_end+0x7ff80000>
+  bc:    ff9ff06f              j    b4 <_loop>
+
+000000c0 <main>:
+#define CLIP(a) asm (".insn r CUSTOM_0, 0x7, 0x20, %[dst], %[src], zero" : [dst] "=r" (a) : [src] "r" (a))
+
+extern char buf_i[];
+
+int main(void)
+{
+  c0:    fc010113              add    sp,sp,-64
+  c4:    03312623              sw    s3,44(sp)
+  c8:    03512223              sw    s5,36(sp)
+            /* Clipping */
+            //result = ((result<0) ? 0 : ((result>127) ? 127 : result));
+            CLIP(result);
+            
+            buf_o[(a - 1) * WIDTH + (b - 1)] = result;
+            *((volatile char *)0xe0000030) = result;
+  cc:    e00009b7              lui    s3,0xe0000
+    char * volatile buf_o = buf_i;
+  d0:    0001ba97              auipc    s5,0x1b
+  d4:    b30a8a93              add    s5,s5,-1232 # 1ac00 <buf_i>
+{
+  d8:    03212823              sw    s2,48(sp)
+  dc:    03612023              sw    s6,32(sp)
+  e0:    01712e23              sw    s7,28(sp)
+  e4:    02112e23              sw    ra,60(sp)
+  e8:    02812c23              sw    s0,56(sp)
+  ec:    02912a23              sw    s1,52(sp)
+  f0:    03412423              sw    s4,40(sp)
+    char * volatile buf_o = buf_i;
+  f4:    01512623              sw    s5,12(sp)
+  f8:    02000913              li    s2,32
+            *((volatile char *)0xe0000030) = result;
+  fc:    03098993              add    s3,s3,48 # e0000030 <_end+0xdff80030>
+        for (b = 1; b < WIDTH - 1; b++)
+ 100:    01f00b13              li    s6,31
+    for (a = 1; a < HEIGHT - 1; a++)
+ 104:    3e000b93              li    s7,992
+        for (b = 1; b < WIDTH - 1; b++)
+ 108:    00090a13              mv    s4,s2
+ 10c:    014a8433              add    s0,s5,s4
+ 110:    02090913              add    s2,s2,32
+ 114:    00100493              li    s1,1
+                         -7*(int)buf_i[(a - 1) * WIDTH + b - 1] +
+ 118:    fe044783              lbu    a5,-32(s0)
+            result=((
+ 11c:    00d00593              li    a1,13
+        for (b = 1; b < WIDTH - 1; b++)
+ 120:    00140413              add    s0,s0,1
+                         -7*(int)buf_i[(a - 1) * WIDTH + b - 1] +
+ 124:    00379713              sll    a4,a5,0x3
+ 128:    40e78533              sub    a0,a5,a4
+                          5*(int)buf_i[(a - 1) * WIDTH + b    ] +
+ 12c:    fe044703              lbu    a4,-32(s0)
+ 130:    00271793              sll    a5,a4,0x2
+ 134:    00e787b3              add    a5,a5,a4
+                         -7*(int)buf_i[(a - 1) * WIDTH + b - 1] +
+ 138:    00f50533              add    a0,a0,a5
+                          2*(int)buf_i[(a - 1) * WIDTH + b + 1] +
+ 13c:    fe144783              lbu    a5,-31(s0)
+                         15*(int)buf_i[ a      * WIDTH + b    ] +
+ 140:    00044703              lbu    a4,0(s0)
+                          2*(int)buf_i[(a - 1) * WIDTH + b + 1] +
+ 144:    00179793              sll    a5,a5,0x1
+                          5*(int)buf_i[(a - 1) * WIDTH + b    ] +
+ 148:    00f50533              add    a0,a0,a5
+                         -1*(int)buf_i[ a      * WIDTH + b - 1] +
+ 14c:    fff44783              lbu    a5,-1(s0)
+                          2*(int)buf_i[(a - 1) * WIDTH + b + 1] +
+ 150:    40f50533              sub    a0,a0,a5
+                         15*(int)buf_i[ a      * WIDTH + b    ] +
+ 154:    00471793              sll    a5,a4,0x4
+ 158:    40e787b3              sub    a5,a5,a4
+                         -1*(int)buf_i[ a      * WIDTH + b - 1] +
+ 15c:    00f50533              add    a0,a0,a5
+                         -1*(int)buf_i[ a      * WIDTH + b + 1] +
+ 160:    00144783              lbu    a5,1(s0)
+                          5*(int)buf_i[(a + 1) * WIDTH + b    ] +
+ 164:    02044703              lbu    a4,32(s0)
+                         15*(int)buf_i[ a      * WIDTH + b    ] +
+ 168:    40f50533              sub    a0,a0,a5
+                          2*(int)buf_i[(a + 1) * WIDTH + b - 1] +
+ 16c:    01f44783              lbu    a5,31(s0)
+ 170:    00179793              sll    a5,a5,0x1
+                         -1*(int)buf_i[ a      * WIDTH + b + 1] +
+ 174:    00f50533              add    a0,a0,a5
+                          5*(int)buf_i[(a + 1) * WIDTH + b    ] +
+ 178:    00271793              sll    a5,a4,0x2
+ 17c:    00e787b3              add    a5,a5,a4
+                          2*(int)buf_i[(a + 1) * WIDTH + b - 1] +
+ 180:    00f50533              add    a0,a0,a5
+                         -7*(int)buf_i[(a + 1) * WIDTH + b + 1] +
+ 184:    02144783              lbu    a5,33(s0)
+ 188:    00379713              sll    a4,a5,0x3
+ 18c:    40e787b3              sub    a5,a5,a4
+                          5*(int)buf_i[(a + 1) * WIDTH + b    ] +
+ 190:    00f50533              add    a0,a0,a5
+            result=((
+ 194:    08050513              add    a0,a0,128
+ 198:    00000097              auipc    ra,0x0
+ 19c:    060080e7              jalr    96(ra) # 1f8 <__divsi3>
+            buf_o[(a - 1) * WIDTH + (b - 1)] = result;
+ 1a0:    00c12783              lw    a5,12(sp)
+            CLIP(result);
+ 1a4:    4005750b              .insn    4, 0x4005750b
+            buf_o[(a - 1) * WIDTH + (b - 1)] = result;
+ 1a8:    0ff57513              zext.b    a0,a0
+ 1ac:    009787b3              add    a5,a5,s1
+ 1b0:    014787b3              add    a5,a5,s4
+ 1b4:    fca78fa3              sb    a0,-33(a5)
+            *((volatile char *)0xe0000030) = result;
+ 1b8:    00a98023              sb    a0,0(s3)
+        for (b = 1; b < WIDTH - 1; b++)
+ 1bc:    00148493              add    s1,s1,1
+ 1c0:    f5649ce3              bne    s1,s6,118 <main+0x58>
+    for (a = 1; a < HEIGHT - 1; a++)
+ 1c4:    f57912e3              bne    s2,s7,108 <main+0x48>
+        }
+    }
+
+    return 0;
+
+}
+ 1c8:    03c12083              lw    ra,60(sp)
+ 1cc:    03812403              lw    s0,56(sp)
+ 1d0:    03412483              lw    s1,52(sp)
+ 1d4:    03012903              lw    s2,48(sp)
+ 1d8:    02c12983              lw    s3,44(sp)
+ 1dc:    02812a03              lw    s4,40(sp)
+ 1e0:    02412a83              lw    s5,36(sp)
+ 1e4:    02012b03              lw    s6,32(sp)
+ 1e8:    01c12b83              lw    s7,28(sp)
+ 1ec:    00000513              li    a0,0
+ 1f0:    04010113              add    sp,sp,64
+ 1f4:    00008067              ret
+
+000001f8 <__divsi3>:
+ 1f8:    06054063              bltz    a0,258 <__umodsi3+0x10>
+ 1fc:    0605c663              bltz    a1,268 <__umodsi3+0x20>
+
+00000200 <__hidden___udivsi3>:
+ 200:    00058613              mv    a2,a1
+ 204:    00050593              mv    a1,a0
+ 208:    fff00513              li    a0,-1
+ 20c:    02060c63              beqz    a2,244 <__hidden___udivsi3+0x44>
+ 210:    00100693              li    a3,1
+ 214:    00b67a63              bgeu    a2,a1,228 <__hidden___udivsi3+0x28>
+ 218:    00c05863              blez    a2,228 <__hidden___udivsi3+0x28>
+ 21c:    00161613              sll    a2,a2,0x1
+ 220:    00169693              sll    a3,a3,0x1
+ 224:    feb66ae3              bltu    a2,a1,218 <__hidden___udivsi3+0x18>
+ 228:    00000513              li    a0,0
+ 22c:    00c5e663              bltu    a1,a2,238 <__hidden___udivsi3+0x38>
+ 230:    40c585b3              sub    a1,a1,a2
+ 234:    00d56533              or    a0,a0,a3
+ 238:    0016d693              srl    a3,a3,0x1
+ 23c:    00165613              srl    a2,a2,0x1
+ 240:    fe0696e3              bnez    a3,22c <__hidden___udivsi3+0x2c>
+ 244:    00008067              ret
+
+00000248 <__umodsi3>:
+ 248:    00008293              mv    t0,ra
+ 24c:    fb5ff0ef              jal    200 <__hidden___udivsi3>
+ 250:    00058513              mv    a0,a1
+ 254:    00028067              jr    t0
+ 258:    40a00533              neg    a0,a0
+ 25c:    00b04863              bgtz    a1,26c <__umodsi3+0x24>
+ 260:    40b005b3              neg    a1,a1
+ 264:    f9dff06f              j    200 <__hidden___udivsi3>
+ 268:    40b005b3              neg    a1,a1
+ 26c:    00008293              mv    t0,ra
+ 270:    f91ff0ef              jal    200 <__hidden___udivsi3>
+ 274:    40a00533              neg    a0,a0
+ 278:    00028067              jr    t0
+
+0000027c <__modsi3>:
+ 27c:    00008293              mv    t0,ra
+ 280:    0005ca63              bltz    a1,294 <__modsi3+0x18>
+ 284:    00054c63              bltz    a0,29c <__modsi3+0x20>
+ 288:    f79ff0ef              jal    200 <__hidden___udivsi3>
+ 28c:    00058513              mv    a0,a1
+ 290:    00028067              jr    t0
+ 294:    40b005b3              neg    a1,a1
+ 298:    fe0558e3              bgez    a0,288 <__modsi3+0xc>
+ 29c:    40a00533              neg    a0,a0
+ 2a0:    f61ff0ef              jal    200 <__hidden___udivsi3>
+ 2a4:    40b00533              neg    a0,a1
+ 2a8:    00028067              jr    t0
