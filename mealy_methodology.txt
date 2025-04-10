@@ -1,0 +1,44 @@
+`timescale 1ps/1ps
+module name(
+input 
+output
+);
+
+  
+    parameter inital, state1, etc;
+    reg [1:0] state, next_state;
+    reg output_prev;
+    
+    always @(posedge clk) begin
+        if (reset) begin
+            state <= initial;
+            output_prev <=0;
+            end
+        else begin
+            state <= next_state;
+            output_prev <= output;
+            end
+    end
+
+
+    always @(*) begin
+    next_state = state;
+    output = output_prev;
+        case (state)
+            initial: case (inputs)
+                    A: begin next_state = S2; output = val; end
+                    B: begin next_state = S1; output = val; end
+                    C: begin next_state = intial; output = val; end
+                    default: next_state = intial;
+                 endcase
+            State1: case (coins)
+                    2'b01: begin next_state = S0; coffee = 1; end
+                    2'b10: begin next_state = S2; coffee = 0; end
+                    2'b00: begin next_state = S1; coffee = 0; end
+                    default: next_state = S1;
+                 endcase
+            default: next_state = S0;
+        endcase
+      
+    end
+endmodule
