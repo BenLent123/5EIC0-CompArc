@@ -26,18 +26,18 @@ output
     output = output_prev;
         case (state)
             initial: case (inputs)
-                    A: begin next_state = S2; output = val; end
-                    B: begin next_state = S1; output = val; end
-                    C: begin next_state = intial; output = val; end
-                    default: next_state = intial;
+                    A: begin next_state = State2; output = val; end
+                    B: begin next_state = State1; output = val; end
+                    C: begin next_state = initial; output = val; end
+                    default: next_state = initial;
                  endcase
-            State1: case (coins)
-                    2'b01: begin next_state = S0; coffee = 1; end
-                    2'b10: begin next_state = S2; coffee = 0; end
-                    2'b00: begin next_state = S1; coffee = 0; end
-                    default: next_state = S1;
+            State1: case (inputs)
+                    A: begin next_state = initial; output = 1; end
+                    B: begin next_state = State2; output = 0; end
+                    C: begin next_state = State1; output = 0; end
+                    default: next_state = State1;
                  endcase
-            default: next_state = S0;
+            default: next_state = initial;
         endcase
       
     end
