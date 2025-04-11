@@ -1,0 +1,16 @@
+- to simulate if or even while (conditions) --> use bne (branch not equal) blt (branch less than) bge (branch greater than)
+- important to note is that sometimes the operator if, is reversed in assembly such that in c: if(a) become (bne val,!a,goto)
+- to put values into other variables one can use mv (move) lw (load word) or li (load immediate) depending on the situation
+- mv reg, val --> moves value into register or li reg, 3 --> loads 3 into reg ! if a reg is not assigned a value or is overwritten it has random numbers in it!
+- the stack pointer or sp is super important! using it become very important for recursive calls! if you dont save on the stack and your function loops things such as
+    addi a0,a0,1 then you keep overwritting your a0
+- furthermore the stack pointer is used to save Ra the return address from main when you use call in your function example:
+  
+func:
+    addi sp,sp,-4 --> moves stack by one word (4 bytes)
+    sw ra ,0(sp)     (saves return address ra into that location) 
+    //do stuff
+    call func  --> overwrites ra
+    lw ra, 0(sp) --> load main ra
+    addi sp,sp,4 --> moves stack back
+    ret
