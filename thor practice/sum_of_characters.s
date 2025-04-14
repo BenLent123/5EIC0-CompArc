@@ -34,26 +34,26 @@ main:
 
 sum_of_ASCII:
     li t0,0     #sum
-    li t1,0     #i
-    j while
+    li t1,0     #set t1 as variable i 
+    j while    # jump to while no branch needed
     
 while:
-    addi sp,sp,-4
-    sw ra,0(sp)
+    addi sp,sp,-4     #push stack    
+    sw ra,0(sp)        #save return address
     
     
-    add t2,a0,t1  # find str[i]
-    lb t3,0(t2)     # load str[i]
-    beq t3,x0,end   # if str[i] is null
-    add t0,t0,t3    # sum = sum+val
-    addi t1,t1,1    # increment i str[i] -> str[i+1]
+    add t2,a0,t1     #find str[i] so a0 which is base address + t1 which is i gives str[base] + offset(i) = str[i]
+    lb t3,0(t2)     # load str[i] -> byte so lb else lw
+    beq t3,x0,end   # if str[i] is null -> null has value 0
+    add t0,t0,t3    # sum = sum+val    -> add value in reg to sum
+    addi t1,t1,1    # increment i str[i] -> str[i+1] --> increment by byte so 1 instead of 4 which would be the next number in total!
     
-    call while
+    call while       # recursive call
     
-    lw ra,0(sp)
-    addi sp,sp,4
+    lw ra,0(sp)        # load return address to main
+    addi sp,sp,4        #pop stack
     
     ret
 end:
-    mv a0,t0
-    ret
+    mv a0,t0    # save into a0 since we only ever return a0
+    ret            # return
