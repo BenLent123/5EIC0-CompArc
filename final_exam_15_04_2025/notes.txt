@@ -1,0 +1,4 @@
+1 mealy fsm --> traffic light Mealy fsm with 5 states (red,yellow,green,walk,warn)
+1 moore fsm --> traffic light just as moore
+1 circuit diagram with moore fsm instanciation --> big if(condition) -> ((!(wait_wire && reg_val) || colour[1] ) && crossing[1]) && enable)
+1 riscV question --> similar to gcd --> remainder if a%b when a>=b !
